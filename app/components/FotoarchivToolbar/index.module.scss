@@ -1,0 +1,179 @@
+@import '../../styles/responsives.scss';
+
+.fotoarchiv-toolbar {
+  display: flex;
+
+  @include xs {
+    position: static;
+    padding: calc(var(--border)* 1) calc(var(--border)* 1.5);
+    border-bottom: 1px solid var(--color_white);
+    width: 100%;
+    gap: 11px;
+    overflow: scroll;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+
+    &::-moz-scrollbar {
+      display: none;
+    }
+
+    -ms-overflow-style: none; 
+    scrollbar-width: none; 
+  }
+
+  @include l {
+    position: absolute;
+    top: 0;
+    right: 0;
+    padding: 0;
+    border-bottom: none;
+    margin-top: calc(var(--border)* 1.5);
+    margin-right: 102px;
+    width: fit-content;
+    gap: 26px;
+    overflow: unset;
+  }
+
+  .konferenzen {
+    @include xs {
+      width: fit-content;
+      display: flex;
+    }
+
+    @include l {
+      width: 97px;
+      display: block;
+    }
+    
+    &__top {
+      display: flex;
+      align-items: center;
+
+      @include xs {
+        gap: 4px;
+      }
+
+      @include l {
+        gap: 8px;
+      }
+
+      &::before {
+        content: '';
+        display: block;
+        border-radius: 50%;
+        border: 1px solid var(--color_white);
+        transition: background-color 0.3s ease;
+
+        @include xs {
+          width: 7.5px;
+          height: 7.5px;
+          transform: translateY(-0.5px);
+        }
+
+        @include l {
+          width: 10px;
+          height: 10px;
+          transform: translateY(0);
+        }
+      }
+
+      &--active {
+        &::before {
+          background-color: var(--color_white);
+        }
+      }
+    }
+
+    &__bottom {
+      display: flex;
+      opacity: 0;
+      visibility: hidden;
+
+      @include xs {
+        width: fit-content;
+        column-gap: 3px;
+        margin-left: 3px;
+        flex-wrap: nowrap;
+      }
+
+      @include l {
+        width: 230px;
+        column-gap: 8px;
+        margin-left: 20px;
+        flex-wrap: wrap;
+      }
+
+      .item {
+        transition: opacity 0.3s ease;
+
+        a {
+          opacity: 0.6;
+
+          &:hover {
+            opacity: 1;
+          }
+        }
+
+        &--active {
+          opacity: 1;
+        }
+      }
+    }
+  }
+
+  .presse {
+    display: flex;
+    height: fit-content;
+
+    @include xs {
+      gap: 11px;
+    }
+
+    @include l {
+      gap: 26px;
+    }
+
+    .item {
+      align-items: center;
+
+      @include xs {
+        gap: 4px;
+      }
+
+      @include l {
+        gap: 8px;
+      }
+
+      &::before {
+        content: '';
+        display: block;
+        border-radius: 50%;
+        border: 1px solid var(--color_white);
+
+        @include xs {
+          width: 7.5px;
+          height: 7.5px;
+          transform: translateY(-0.5px);
+        }
+
+        @include l {
+          width: 10px;
+          height: 10px;
+          transform: translateY(0);
+        }
+      }
+    }
+  }
+
+  .item {
+    display: flex;
+
+    &--active {
+      &::before {
+        background-color: var(--color_white);
+      }
+    }
+  }
+}

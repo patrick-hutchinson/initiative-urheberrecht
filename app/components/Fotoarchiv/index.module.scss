@@ -1,0 +1,14 @@
+@import '../../styles/responsives.scss';
+
+.fotoarchiv {
+  display: block;
+  padding: calc(var(--border)* 1.5);
+
+  @include xs {
+    margin-bottom: 50px;
+  }
+
+  @include l {
+    margin-bottom: 160px;
+  }
+}

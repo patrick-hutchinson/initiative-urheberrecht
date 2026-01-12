@@ -1,0 +1,75 @@
+@import '../../styles/responsives.scss';
+
+.fotoarchiv-mode-changer {
+  display: flex;
+  position: absolute;
+
+  @include xs {
+    gap: 24px;
+    top: 13.75px;
+    right: 47px;
+  }
+
+  @include m {
+    gap: 24px;
+    top: 17.75px;
+    right: 51px;
+  }
+
+  @include l {
+    gap: 9px;
+    top: 120px;
+    right: calc(var(--border)* 1.5);
+  }
+
+  .icon-container, .icon {
+    @include xs {
+      width: 11px;
+      height: 11px;
+    }
+
+    @include l {
+      width: 24px;
+      height: 24px;
+    }
+  }
+
+  .grid {
+    .icon {
+      @include xs {
+        background-image: url('/fotoarchiv-icons/grid-mobile.svg');
+      }
+
+      @include l {
+        background-image: url('/fotoarchiv-icons/grid-desktop.svg');
+      }
+    }
+  }
+
+  .slides {
+    @include xs {
+      background-image: url('/fotoarchiv-icons/slides-mobile.svg');
+    }
+
+    @include l {
+      background-image: url('/fotoarchiv-icons/slides-desktop.svg');
+    }
+  }
+
+  .icon {
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-color: var(--color_fotoarchiv_mode_changer_default);
+    transition: background-color 0.2s linear;
+  }
+
+  a {
+    &:hover {
+      .icon {
+        background-color:var(--color_fotoarchiv_mode_changer_hover);
+        background-blend-mode: lighten;
+      }
+    }
+  }
+}

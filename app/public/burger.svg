@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="52" height="35" viewBox="0 0 52 35">
+  <defs>
+    <clipPath id="clip-burger">
+      <rect width="52" height="35"/>
+    </clipPath>
+  </defs>
+  <g id="burger" clip-path="url(#clip-burger)">
+    <g id="Group_4300" data-name="Group 4300" transform="translate(-1844.873 -27.983)" style="isolation: isolate">
+      <path id="Line_184" data-name="Line 184" d="M50.793.5H0v-1H50.793Z" transform="translate(1845.373 28.984)"/>
+      <path id="Line_185" data-name="Line 185" d="M50.793.5H0v-1H50.793Z" transform="translate(1845.373 45.28)"/>
+      <path id="Line_186" data-name="Line 186" d="M50.793.5H0v-1H50.793Z" transform="translate(1845.373 61.576)"/>
+    </g>
+  </g>
+</svg>

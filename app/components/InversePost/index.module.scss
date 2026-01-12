@@ -1,0 +1,26 @@
+@import '../../styles/responsives.scss';
+
+.inverse-post {
+    color: var(--color_white) !important;
+    background: var(--color_black) !important;
+
+    a {
+      color: var(--color_white) !important;
+      text-decoration: underline;
+      text-decoration-thickness: 1px;
+      text-decoration-color: var(--color_white) !important;
+
+
+      @include xxs {
+        text-underline-offset: 4.2px;
+      }
+
+      @include s {
+        text-underline-offset: 4.2px;
+      }
+
+      @include m {
+        text-underline-offset: 4.2px;
+      }
+    }
+}

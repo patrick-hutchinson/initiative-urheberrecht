@@ -15,27 +15,17 @@ export default async function handler(req, res) {
   }
 
   if (!email) {
-    return res
-      .status(400)
-      .json({ error: "Bitte geben Sie eine E-Mail-Adresse an." });
+    return res.status(400).json({ error: "Bitte geben Sie eine E-Mail-Adresse an." });
   }
 
   if (!checkbox) {
     return res.status(400).json({
-      error:
-        "Bitte stimmen Sie der Einverständniserklärung der Nutzung Ihrer Daten zu.",
+      error: "Bitte stimmen Sie der Einverständniserklärung der Nutzung Ihrer Daten zu.",
     });
   }
 
   try {
-    const { url, data, headers } = getRequestParams(
-      email,
-      anrede,
-      vorname,
-      nachname,
-      API_KEY,
-      LIST_ID
-    );
+    const { url, data, headers } = getRequestParams(email, anrede, vorname, nachname, API_KEY, LIST_ID);
 
     const response = await fetch(url, {
       method: "POST",
@@ -55,8 +45,7 @@ export default async function handler(req, res) {
   } catch (err) {
     console.error("[newsletter] Unexpected error", err);
     return res.status(500).json({
-      error:
-        "Bei Ihrer Anfrage ist ein Fehler aufgetreten. Bitte versuche es erneut.",
+      error: "Bei Ihrer Anfrage ist ein Fehler aufgetreten. Bitte versuche es erneut.",
     });
   }
 }

@@ -23,19 +23,16 @@ import { FotoarchivContext } from "/contexts/FotoarchivContext";
 
 Modal.setAppElement("#__next");
 
+// export async function getServerSideProps() {
+//   const fotos = await sanityClient.fetch(`*[_type == "photo"] | order(orderRank asc)`);
+//   return { props: { fotos } };
+// }
+
 export default function Konferenz({ konferenz, menuItems, fotoarchiv }) {
-  const {
-    overlays,
-    storeOverlays,
-    resetOverlays,
-    closeEvent,
-    storeCloseEvent,
-    openEvent,
-    storeOpenEvent,
-  } = useContext(OverlaysContext);
+  const { overlays, storeOverlays, resetOverlays, closeEvent, storeCloseEvent, openEvent, storeOpenEvent } =
+    useContext(OverlaysContext);
   const { opened, storeOpened } = useContext(MenuContext);
-  const { fotoarchivState, storeFotoarchivState } =
-    useContext(FotoarchivContext);
+  const { fotoarchivState, storeFotoarchivState } = useContext(FotoarchivContext);
   const progAnchorRef = useRef();
   const amPodAnchorRef = useRef();
 
@@ -44,9 +41,7 @@ export default function Konferenz({ konferenz, menuItems, fotoarchiv }) {
   const router = useRouter();
 
   useEffect(() => {
-    document.body.style.background = getComputedStyle(
-      document.querySelector(":root")
-    ).getPropertyValue("--color_white");
+    document.body.style.background = getComputedStyle(document.querySelector(":root")).getPropertyValue("--color_white");
   }, []);
 
   // Change date format
@@ -54,9 +49,7 @@ export default function Konferenz({ konferenz, menuItems, fotoarchiv }) {
     konferenz.program.days.forEach((dayObj) => {
       if (dayObj.date) {
         const date = new Date(dayObj.date);
-        const day = date
-          .toLocaleDateString("de-DE", { weekday: "short" })
-          .replace(".", "");
+        const day = date.toLocaleDateString("de-DE", { weekday: "short" }).replace(".", "");
         const dayAndMonth = date.toLocaleDateString("de-DE", {
           day: "numeric",
           month: "long",
@@ -110,43 +103,32 @@ export default function Konferenz({ konferenz, menuItems, fotoarchiv }) {
           };
         }
         return overlay;
-      })
+      }),
     );
     storeOpenEvent(true);
 
     storeCloseEvent(false);
-    router.push(
-      `/konferenz/${konferenz.slug.current}?modal=${ref}`,
-      undefined,
-      { shallow: true, scroll: false }
-    );
+    router.push(`/konferenz/${konferenz.slug.current}?modal=${ref}`, undefined, { shallow: true, scroll: false });
   };
 
   const handleNavigation = (path) => {
-    gsap.to(
-      [
-        document.querySelector(".page"),
-        document.querySelector("nav"),
-        document.querySelector("#am-podium"),
-      ],
-      {
-        opacity: 0,
-        duration: 1,
-        onComplete: () => {
-          router.push(path);
-          storeOpenEvent(false);
-          storeCloseEvent(true);
-          storeOverlays((prev) =>
-            prev.map((overlay) => {
-              return {
-                ...overlay,
-                show: false,
-              };
-            })
-          );
-        },
-      }
-    );
+    gsap.to([document.querySelector(".page"), document.querySelector("nav"), document.querySelector("#am-podium")], {
+      opacity: 0,
+      duration: 1,
+      onComplete: () => {
+        router.push(path);
+        storeOpenEvent(false);
+        storeCloseEvent(true);
+        storeOverlays((prev) =>
+          prev.map((overlay) => {
+            return {
+              ...overlay,
+              show: false,
+            };
+          }),
+        );
+      },
+    });
   };
 
   const linksBlank = {
@@ -183,10 +165,7 @@ export default function Konferenz({ konferenz, menuItems, fotoarchiv }) {
           <div className="uniblock">
             <div className="uniblock-title">
               <h1 className="scalable-first">
-                <a
-                  className="no-underline"
-                  onClick={() => handleNavigation("/")}
-                >
+                <a className="no-underline" onClick={() => handleNavigation("/")}>
                   <span style={{ letterSpacing: "-0.06em" }}>©</span>
                 </a>
                 {width < 576 ? <br /> : ` `}
@@ -195,25 +174,15 @@ export default function Konferenz({ konferenz, menuItems, fotoarchiv }) {
             </div>
             <div className="uniblock-image">
               {konferenz.topImages[0].url && (
-                <RandomImage
-                  id={konferenz.menuTitle}
-                  slug={konferenz.slug.current}
-                  data={konferenz.topImages}
-                />
+                <RandomImage id={konferenz.menuTitle} slug={konferenz.slug.current} data={konferenz.topImages} />
               )}
             </div>
             {width > 992 ? (
               <div className="uniblock-text">
-                <PortableText
-                  value={konferenz.description}
-                  components={linksBlank}
-                />
+                <PortableText value={konferenz.description} components={linksBlank} />
               </div>
             ) : (
-              <OverflowPortableText
-                value={konferenz.description}
-                components={linksBlank}
-              />
+              <OverflowPortableText value={konferenz.description} components={linksBlank} />
             )}
           </div>
         )}
@@ -227,22 +196,14 @@ export default function Konferenz({ konferenz, menuItems, fotoarchiv }) {
                     <>
                       {konferenz.program.days.map((d, index) => (
                         <React.Fragment key={index}>
-                          <a onClick={() => openOverlay("program", index)}>
-                            T. {index + 1}
-                          </a>
+                          <a onClick={() => openOverlay("program", index)}>T. {index + 1}</a>
                           {index < konferenz.program.days.length - 1 && ", "}
                         </React.Fragment>
                       ))}
                       <span>&nbsp;Programm</span>
                     </>
                   ) : (
-                    <a
-                      onClick={() =>
-                        openOverlay("program", konferenz.program.days[0])
-                      }
-                    >
-                      Programm
-                    </a>
+                    <a onClick={() => openOverlay("program", konferenz.program.days[0])}>Programm</a>
                   )}
                 </h1>
               )}
@@ -254,9 +215,7 @@ export default function Konferenz({ konferenz, menuItems, fotoarchiv }) {
                     <a onClick={() => openOverlay("am-podium")}>Redner:innen</a>
                   </h1>
                 ))}
-              {fotoarchiv.konferenz?.filter(
-                (f) => f.slug.current === konferenz.slug.current
-              )[0].fotoarchiv?.length > 0 ? (
+              {fotoarchiv.konferenz?.filter((f) => f.slug.current === konferenz.slug.current)[0].fotoarchiv?.length > 0 ? (
                 <h1 className="scalable">
                   <a
                     onClick={() => {
@@ -265,9 +224,7 @@ export default function Konferenz({ konferenz, menuItems, fotoarchiv }) {
                         ...prev,
                         mode: "grid",
                         part: "konferenz",
-                        id: fotoarchiv.konferenz.findIndex(
-                          (k) => k.slug.current === konferenz.slug.current
-                        ),
+                        id: fotoarchiv.konferenz.findIndex((k) => k.slug.current === konferenz.slug.current),
                         folder: 0,
                         slide: 0,
                       }));
@@ -286,10 +243,7 @@ export default function Konferenz({ konferenz, menuItems, fotoarchiv }) {
                     src={`${konferenz.bottomMedia.bottomImage.url}?dpr=1`}
                     srcSet={`${konferenz.bottomMedia.bottomImage.url}?dpr=2 2x`}
                     placeholder="blur"
-                    blurDataURL={
-                      konferenz.bottomMedia.bottomImage.blurDataURL.metadata
-                        .lqip
-                    }
+                    blurDataURL={konferenz.bottomMedia.bottomImage.blurDataURL.metadata.lqip}
                     width={konferenz.bottomMedia.bottomImage.width}
                     height={konferenz.bottomMedia.bottomImage.height}
                     sizes="auto"
@@ -300,10 +254,7 @@ export default function Konferenz({ konferenz, menuItems, fotoarchiv }) {
               {konferenz.bottomMedia &&
                 konferenz.bottomMedia.selectedMedia === "embedVideo" &&
                 konferenz.bottomMedia.embedVideo.url && (
-                  <VideoEmbed
-                    url={konferenz.bottomMedia.embedVideo.url}
-                    presse={false}
-                  />
+                  <VideoEmbed url={konferenz.bottomMedia.embedVideo.url} presse={false} />
                 )}
             </div>
             <div className="block-text col-2">
@@ -311,10 +262,7 @@ export default function Konferenz({ konferenz, menuItems, fotoarchiv }) {
                 konferenz.importantBlocks.block.map((b, index) => (
                   <div className="important-block" key={index}>
                     <p className="important-block-title">{b.title}</p>
-                    <PortableText
-                      value={b.description}
-                      components={linksBlank}
-                    />
+                    <PortableText value={b.description} components={linksBlank} />
                   </div>
                 ))}
             </div>
@@ -331,8 +279,7 @@ export default function Konferenz({ konferenz, menuItems, fotoarchiv }) {
       {/* PROGRAM */}
       <Modal
         isOpen={
-          overlays.find((overlay) => overlay.ref === "program") &&
-          overlays.find((overlay) => overlay.ref === "program").show
+          overlays.find((overlay) => overlay.ref === "program") && overlays.find((overlay) => overlay.ref === "program").show
         }
         onRequestClose={() =>
           router.push(`/konferenz/${konferenz.slug.current}`, undefined, {
@@ -342,10 +289,7 @@ export default function Konferenz({ konferenz, menuItems, fotoarchiv }) {
         }
         style={modalStyle}
       >
-        <Overlay
-          id="program"
-          toolbarDownload={konferenz.programFile?.url || ""}
-        >
+        <Overlay id="program" toolbarDownload={konferenz.programFile?.url || ""}>
           {konferenz.program.days?.length > 0 &&
             konferenz.program.days.map((day, index) => (
               <React.Fragment key={index}>
@@ -370,10 +314,7 @@ export default function Konferenz({ konferenz, menuItems, fotoarchiv }) {
                                 </div>
                                 <div className="event-title">
                                   <h4>
-                                    <PortableText
-                                      value={e.eventTitle}
-                                      components={linksBlank}
-                                    />
+                                    <PortableText value={e.eventTitle} components={linksBlank} />
                                   </h4>
                                 </div>
                               </div>
@@ -405,10 +346,7 @@ export default function Konferenz({ konferenz, menuItems, fotoarchiv }) {
           <div className="overlay-content-title">
             <h1>
               <span style={{ letterSpacing: "-0.06em" }}>
-                <a
-                  onClick={() => handleNavigation("/")}
-                  className="no-underline white"
-                >
+                <a onClick={() => handleNavigation("/")} className="no-underline white">
                   ©
                 </a>
                 {width < 576 && <br />}
@@ -443,10 +381,7 @@ export default function Konferenz({ konferenz, menuItems, fotoarchiv }) {
                       </div>
                       <div className="person-about">
                         <h3>
-                          <PortableText
-                            value={a.about}
-                            components={linksBlank}
-                          />
+                          <PortableText value={a.about} components={linksBlank} />
                         </h3>
                       </div>
                     </div>
@@ -481,10 +416,7 @@ export default function Konferenz({ konferenz, menuItems, fotoarchiv }) {
           <div className="overlay-content-title">
             <h1>
               <span style={{ letterSpacing: "-0.06em" }}>
-                <a
-                  onClick={() => handleNavigation("/")}
-                  className="no-underline white"
-                >
+                <a onClick={() => handleNavigation("/")} className="no-underline white">
                   ©
                 </a>
                 {width < 576 && <br />}
@@ -571,7 +503,7 @@ export async function getStaticProps({ params }) {
         importantBlocks
       }
     `,
-    { slug: params.slug }
+    { slug: params.slug },
   );
 
   const fotoarchiv = await client.fetch(`
@@ -633,6 +565,6 @@ export async function getStaticProps({ params }) {
       menuItems,
       fotoarchiv,
     },
-    revalidate: 3600, // Revalidate every hour (was 1 second - too aggressive)
+    revalidate: 60, // Revalidate every hour (was 1 second - too aggressive)
   };
 }

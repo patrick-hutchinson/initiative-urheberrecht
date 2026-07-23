@@ -72,6 +72,6 @@ export async function getStaticProps() {
         props: {
             menuItems
         },
-        revalidate: 3600, // Revalidate every hour (was 1 second - too aggressive)
+        revalidate: 60, // Revalidate every minute
     };
 }

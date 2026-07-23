@@ -97,6 +97,6 @@ export async function getStaticProps() {
     props: {
       contact, menuItems
     },
-    revalidate: 3600, // Revalidate every hour
+    revalidate: 60, // Revalidate every minute
   }
 }

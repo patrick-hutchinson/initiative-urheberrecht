@@ -56,6 +56,6 @@ export async function getStaticProps() {
       konferenzes,
       poster
     },
-    revalidate: 3600, // Revalidate every hour (was 10 seconds - too aggressive)
+    revalidate: 60, // Revalidate every minute
   }
 }

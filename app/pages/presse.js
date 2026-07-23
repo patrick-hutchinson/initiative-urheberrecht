@@ -334,6 +334,6 @@ export async function getStaticProps() {
       anchors: anchorsArray,
       fotoarchiv,
     },
-    revalidate: 3600, // Revalidate every hour
+    revalidate: 60, // Revalidate every minute
   };
 }

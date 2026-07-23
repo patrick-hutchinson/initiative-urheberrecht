@@ -565,6 +565,6 @@ export async function getStaticProps({ params }) {
       menuItems,
       fotoarchiv,
     },
-    revalidate: 60, // Revalidate every hour (was 1 second - too aggressive)
+    revalidate: 60, // Revalidate every minute
   };
 }

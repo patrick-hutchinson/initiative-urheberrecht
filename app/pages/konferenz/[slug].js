@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useContext } from "react";
 import { MainLayout } from "/components/MainLayout";
 import Menu from "/components/Menu";
 import client from "/client";
-import { isPreviewLikeEnvironment, menuItemsQuery } from "/sanityQueries";
+import { menuItemsQuery } from "/sanityQueries";
 import RandomImage from "/components/RandomImage";
 import Image from "next/image";
 import Slogan from "/components/Slogan";
@@ -153,18 +153,24 @@ export default function Konferenz({ konferenz, menuItems, fotoarchiv }) {
     );
   }
 
-  const currentSlug = konferenz?.slug?.current || router.query.slug;
-  const topImages = konferenz?.topImages || [];
-  const programDays = konferenz?.program?.days || [];
-  const amPodium = konferenz?.amPodium || [];
-  const bottomMedia = konferenz?.bottomMedia || {};
+  const currentSlug = konferenz.slug?.current || router.query.slug;
+  const topImages = Array.isArray(konferenz.topImages)
+    ? konferenz.topImages.filter((image) => image?.url && image?.blurDataURL?.metadata?.lqip)
+    : [];
+  const programDays = Array.isArray(konferenz.program?.days) ? konferenz.program.days.filter(Boolean) : [];
+  const amPodium = Array.isArray(konferenz.amPodium) ? konferenz.amPodium : [];
+  const bottomMedia = konferenz.bottomMedia || {};
   const bottomImage = bottomMedia.bottomImage || {};
-  const importantBlocks = konferenz?.importantBlocks?.block || [];
+  const hasBottomPhoto = bottomMedia.selectedMedia === "photo" && bottomImage.url && bottomImage.blurDataURL?.metadata?.lqip;
+  const hasBottomVideo = bottomMedia.selectedMedia === "embedVideo" && bottomMedia.embedVideo?.url;
+  const importantBlocks = Array.isArray(konferenz.importantBlocks?.block)
+    ? konferenz.importantBlocks.block.filter(Boolean)
+    : [];
   const currentFotoarchivIndex = fotoarchiv?.konferenz?.findIndex((k) => k?.slug?.current === currentSlug) ?? -1;
   const currentFotoarchiv = currentFotoarchivIndex >= 0 ? fotoarchiv.konferenz[currentFotoarchivIndex] : null;
 
   programDays.forEach((dayObj) => {
-    if (dayObj.date) {
+    if (dayObj?.date) {
       const date = new Date(dayObj.date);
       const day = date.toLocaleDateString("de-DE", { weekday: "short" }).replace(".", "");
       const dayAndMonth = date.toLocaleDateString("de-DE", {
@@ -178,8 +184,10 @@ export default function Konferenz({ konferenz, menuItems, fotoarchiv }) {
   return (
     <MainLayout>
       <section id="konferenz" className="page" style={{ opacity: 0 }}>
-        {!hasSanityValue(konferenz.pageTitle) && !hasSanityValue(konferenz.pageTitleMobile) && <SanityPreviewFallback />}
-        {(hasSanityValue(konferenz.pageTitle) || hasSanityValue(konferenz.pageTitleMobile)) && (
+        {(hasSanityValue(konferenz.pageTitle) ||
+          hasSanityValue(konferenz.pageTitleMobile) ||
+          topImages[0]?.url ||
+          hasSanityValue(konferenz.description)) && (
           <div className="uniblock">
             <div className="uniblock-title">
               <h1 className="scalable-first">
@@ -188,9 +196,9 @@ export default function Konferenz({ konferenz, menuItems, fotoarchiv }) {
                 </a>
                 {width < 576 ? <br /> : ` `}
                 {width > 576 ? (
-                  <SanityPreviewValue value={konferenz.pageTitle} />
+                  <SanityPreviewValue value={konferenz.pageTitle} fieldTitle="Page title" />
                 ) : (
-                  <SanityPreviewValue value={konferenz.pageTitleMobile || konferenz.pageTitle} />
+                  <SanityPreviewValue value={konferenz.pageTitleMobile || konferenz.pageTitle} fieldTitle="Page title mobile" />
                 )}
               </h1>
             </div>
@@ -198,7 +206,7 @@ export default function Konferenz({ konferenz, menuItems, fotoarchiv }) {
               {topImages[0]?.url ? (
                 <RandomImage id={konferenz.menuTitle || currentSlug} slug={currentSlug} data={topImages} />
               ) : (
-                <SanityPreviewFallback />
+                <SanityPreviewFallback fieldTitle="Top images" />
               )}
             </div>
             {width > 992 ? (
@@ -206,7 +214,7 @@ export default function Konferenz({ konferenz, menuItems, fotoarchiv }) {
                 {hasSanityValue(konferenz.description) ? (
                   <PortableText value={konferenz.description} components={linksBlank} />
                 ) : (
-                  <SanityPreviewFallback />
+                  <SanityPreviewFallback fieldTitle="Description" />
                 )}
               </div>
             ) : (
@@ -214,22 +222,25 @@ export default function Konferenz({ konferenz, menuItems, fotoarchiv }) {
                 {hasSanityValue(konferenz.description) ? (
                   <OverflowPortableText value={konferenz.description} components={linksBlank} />
                 ) : (
-                  <SanityPreviewFallback />
+                  <SanityPreviewFallback fieldTitle="Description" />
                 )}
               </>
             )}
           </div>
         )}
-        {!hasSanityValue(konferenz.topic) && programDays.length === 0 && amPodium.length === 0 && !currentFotoarchiv && (
-          <SanityPreviewFallback />
-        )}
-        {(hasSanityValue(konferenz.topic) || programDays.length > 0 || amPodium.length > 0 || currentFotoarchiv) && (
+        {(hasSanityValue(konferenz.topic) ||
+          programDays[0] ||
+          amPodium[0] ||
+          currentFotoarchiv?.fotoarchiv?.length > 0 ||
+          hasBottomPhoto ||
+          hasBottomVideo ||
+          importantBlocks[0]) && (
           <div className="block">
             <div className="block-title">
               <h1 className="scalable">
-                <SanityPreviewValue value={konferenz.topic} />
+                <SanityPreviewValue value={konferenz.topic} fieldTitle="Topic" />
               </h1>
-              {programDays.length > 0 && (
+              {programDays[0] && (
                 <h1 className="scalable" ref={progAnchorRef}>
                   {programDays.length > 1 ? (
                     <>
@@ -246,7 +257,7 @@ export default function Konferenz({ konferenz, menuItems, fotoarchiv }) {
                   )}
                 </h1>
               )}
-              {amPodium.length > 0 &&
+              {amPodium[0] &&
                 (currentSlug === "2--jahreskonferenz" ? (
                   <h1 className="scalable">Redner:innen</h1>
                 ) : (
@@ -275,14 +286,12 @@ export default function Konferenz({ konferenz, menuItems, fotoarchiv }) {
               ) : null}
             </div>
             <div className="block-image link-on-top-x">
-              {bottomMedia.selectedMedia === "photo" &&
-                bottomImage.url &&
-                bottomImage.blurDataURL?.metadata?.lqip && (
+              {hasBottomPhoto && (
                   <Image
                     src={`${bottomImage.url}?dpr=1`}
                     srcSet={`${bottomImage.url}?dpr=2 2x`}
                     placeholder="blur"
-                    blurDataURL={bottomImage.blurDataURL?.metadata?.lqip}
+                    blurDataURL={bottomImage.blurDataURL.metadata.lqip}
                     width={bottomImage.width}
                     height={bottomImage.height}
                     sizes="auto"
@@ -290,22 +299,19 @@ export default function Konferenz({ konferenz, menuItems, fotoarchiv }) {
                     // {...useNextImageFade('')}
                   />
                 )}
-              {bottomMedia.selectedMedia === "embedVideo" &&
-                bottomMedia.embedVideo?.url && (
-                  <VideoEmbed url={bottomMedia.embedVideo.url} presse={false} />
-                )}
+              {hasBottomVideo && <VideoEmbed url={bottomMedia.embedVideo.url} presse={false} />}
             </div>
             <div className="block-text col-2">
-              {importantBlocks.length > 0 &&
+              {importantBlocks[0] &&
                 importantBlocks.map((b, index) => (
                   <div className="important-block" key={index}>
                     <p className="important-block-title">
-                      <SanityPreviewValue value={b.title} />
+                      <SanityPreviewValue value={b?.title} fieldTitle="Important block title" />
                     </p>
-                    {hasSanityValue(b.description) ? (
+                    {hasSanityValue(b?.description) ? (
                       <PortableText value={b.description} components={linksBlank} />
                     ) : (
-                      <SanityPreviewFallback />
+                      <SanityPreviewFallback fieldTitle="Important block description" />
                     )}
                   </div>
                 ))}
@@ -339,33 +345,33 @@ export default function Konferenz({ konferenz, menuItems, fotoarchiv }) {
               <React.Fragment key={index}>
                 <div className="overlay-content-title">
                   <h1 data-index={index} style={{ maxWidth: "90%" }}>
-                    <SanityPreviewValue value={day.formattedDate} />
+                    <SanityPreviewValue value={day.formattedDate} fieldTitle="Program day date" />
                   </h1>
                 </div>
                 <div className="overlay-content-body">
-                  {day.partOfDays?.partofDay?.length > 0 &&
-                    day.partOfDays.partofDay.map((pd, j) => (
+                  {day?.partOfDays?.partofDay?.length > 0 &&
+                    day.partOfDays.partofDay.filter(Boolean).map((pd, j) => (
                       <div className="part-of-day" key={index}>
                         <div className="part-of-day-title">
                           <p>
-                            <SanityPreviewValue value={pd.title} />
+                            <SanityPreviewValue value={pd?.title} fieldTitle="Part of day title" />
                           </p>
                         </div>
                         <div className="part-of-day-content">
-                          {pd.events?.event?.length > 0 &&
-                            pd.events.event.map((e, index) => (
+                          {pd?.events?.event?.length > 0 &&
+                            pd.events.event.filter(Boolean).map((e, index) => (
                               <div className="event" key={index}>
                                 <div className="event-info">
                                   <h3>
-                                    <SanityPreviewValue value={e.info} />
+                                    <SanityPreviewValue value={e?.info} fieldTitle="Event info" />
                                   </h3>
                                 </div>
                                 <div className="event-title">
                                   <h4>
-                                    {hasSanityValue(e.eventTitle) ? (
+                                    {hasSanityValue(e?.eventTitle) ? (
                                       <PortableText value={e.eventTitle} components={linksBlank} />
                                     ) : (
-                                      <SanityPreviewFallback />
+                                      <SanityPreviewFallback fieldTitle="Event title" />
                                     )}
                                   </h4>
                                 </div>
@@ -415,7 +421,8 @@ export default function Konferenz({ konferenz, menuItems, fotoarchiv }) {
                       <div className="person">
                         <div className="person-title">
                           <h3>
-                            <SanityPreviewValue value={a.name} /> <br /> <SanityPreviewValue value={a.regalia} />
+                            <SanityPreviewValue value={a.name} fieldTitle="Name" /> <br />{" "}
+                            <SanityPreviewValue value={a.regalia} fieldTitle="Regalia" />
                           </h3>
                         </div>
                         <div className="person-photo">
@@ -437,13 +444,13 @@ export default function Konferenz({ konferenz, menuItems, fotoarchiv }) {
                             {hasSanityValue(a.about) ? (
                               <PortableText value={a.about} components={linksBlank} />
                             ) : (
-                              <SanityPreviewFallback />
+                              <SanityPreviewFallback fieldTitle="About" />
                             )}
                           </h3>
                         </div>
                       </div>
                     ) : (
-                      <SanityPreviewFallback className="person" />
+                      <SanityPreviewFallback className="person" fieldTitle="Am Podium reference" />
                     )}
                     {width >= 768 && index % 4 === 3 && (
                       <>
@@ -504,7 +511,7 @@ export async function getStaticPaths() {
 
   return {
     paths,
-    fallback: isPreviewLikeEnvironment ? "blocking" : false,
+    fallback: false,
   };
 }
 

@@ -1,7 +1,6 @@
-export const isProductionEnvironment = process.env.VERCEL_ENV === "production";
-export const isPreviewLikeEnvironment = !isProductionEnvironment;
+const isProduction = process.env.VERCEL_ENV === "production";
 
-export const menuItemsQuery = isProductionEnvironment
+export const menuItemsQuery = isProduction
   ? `
     *[defined(menuTitle) && id != "datenschutz" && id != null] | order(order asc) {
       id,
@@ -11,10 +10,10 @@ export const menuItemsQuery = isProductionEnvironment
   `
   : `
     *[
-      (_type == "konferenz" && defined(slug.current)) ||
+      (id == "konferenz" && defined(slug.current)) ||
       (defined(menuTitle) && id != "datenschutz" && id != null)
     ] | order(order asc) {
-      "id": select(_type == "konferenz" => "konferenz", id),
+      id,
       "menuTitle": coalesce(menuTitle, pageTitle, slug.current),
       slug
     }

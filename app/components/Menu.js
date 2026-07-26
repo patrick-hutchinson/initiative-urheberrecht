@@ -7,6 +7,7 @@ import MenuFooter from './MenuFooter';
 import useWindowDimensions from '../components/useWindowDimensions';
 import { ScrollTrigger } from "gsap/dist/ScrollTrigger";
 import _ from 'lodash';
+import { isSanityPreviewEnvironment } from './SanityPreviewFallback';
 
 export default function Menu({ data }) {
     const [opened, setOpened] = useState(false)
@@ -19,7 +20,6 @@ export default function Menu({ data }) {
     const dataOther = data.filter(item => item.id !== "konferenz")
 
     const router = useRouter()
-    const currentPath = router.asPath.split('?')[0]
 
     const {width, height} = useWindowDimensions()
 
@@ -160,7 +160,7 @@ export default function Menu({ data }) {
                             <br/>
                                 {dataKonferenz.map((mt, index) => {
                                     const conferencePath = `/konferenz/${mt.slug.current}`;
-                                    const isCurrentConference = currentPath === conferencePath;
+                                    const isCurrentConference = !isSanityPreviewEnvironment && router.asPath === conferencePath;
 
                                     return (
                                     <React.Fragment key={index}>

@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useContext } from "react";
 import { MainLayout } from "/components/MainLayout";
 import Menu from "/components/Menu";
 import client from "/client";
-import { menuItemsQuery } from "/sanityQueries";
+import { isPreviewLikeEnvironment, menuItemsQuery } from "/sanityQueries";
 import RandomImage from "/components/RandomImage";
 import Image from "next/image";
 import Slogan from "/components/Slogan";
@@ -464,7 +464,7 @@ export async function getStaticPaths() {
 
   return {
     paths,
-    fallback: false,
+    fallback: isPreviewLikeEnvironment ? "blocking" : false,
   };
 }
 

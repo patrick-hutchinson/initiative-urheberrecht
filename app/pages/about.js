@@ -3,6 +3,7 @@ import React, { useEffect, useRef, useState, useContext } from "react";
 import { gsap } from "gsap/dist/gsap";
 import Menu from "../components/Menu";
 import client from "../client";
+import { menuItemsQuery } from "../sanityQueries";
 import RandomImage from "../components/RandomImage";
 import Image from "next/image";
 import Slogan from "../components/Slogan";
@@ -468,13 +469,7 @@ export async function getStaticProps() {
         tatigkeitenText
       }
   `);
-  const menuItems = await client.fetch(`
-  *[defined(menuTitle) && id != "datenschutz" && id != null] | order(order asc) {
-    id,
-    menuTitle,
-    slug
-  }
-  `);
+  const menuItems = await client.fetch(menuItemsQuery);
   return {
     props: {
       about,

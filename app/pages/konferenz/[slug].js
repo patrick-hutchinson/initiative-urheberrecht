@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useContext } from "react";
 import { MainLayout } from "/components/MainLayout";
 import Menu from "/components/Menu";
 import client from "/client";
+import { menuItemsQuery } from "/sanityQueries";
 import RandomImage from "/components/RandomImage";
 import Image from "next/image";
 import Slogan from "/components/Slogan";
@@ -570,13 +571,7 @@ export async function getStaticProps({ params }) {
         }
     `);
 
-  const menuItems = await client.fetch(`
-      *[defined(menuTitle) && id != "datenschutz" && id != null] | order(order asc) {
-        id,
-        menuTitle,
-        slug
-      }
-    `);
+  const menuItems = await client.fetch(menuItemsQuery);
 
   return {
     props: {

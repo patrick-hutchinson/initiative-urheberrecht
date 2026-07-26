@@ -3,6 +3,7 @@ import React, { useEffect, useRef, useState, useContext } from "react";
 import { gsap } from "gsap/dist/gsap";
 import Menu from "../components/Menu";
 import client from "../client";
+import { menuItemsQuery } from "../sanityQueries";
 import showAfterLoad from "../components/showAfterLoad";
 import { format } from "date-fns";
 import { isPast, parseISO } from "date-fns";
@@ -299,13 +300,7 @@ export async function getStaticProps() {
     }
   `);
 
-  const menuItems = await client.fetch(`
-    *[defined(menuTitle) && id != "datenschutz" && id != null] | order(order asc) {
-      id,
-      menuTitle,
-      slug
-    }
-  `);
+  const menuItems = await client.fetch(menuItemsQuery);
 
   const anchorsArray = [];
   presse.posts.forEach((post) => {

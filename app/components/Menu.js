@@ -7,6 +7,7 @@ import MenuFooter from './MenuFooter';
 import useWindowDimensions from '../components/useWindowDimensions';
 import { ScrollTrigger } from "gsap/dist/ScrollTrigger";
 import _ from 'lodash';
+import { isSanityPreviewEnvironment } from './SanityPreviewFallback';
 
 export default function Menu({ data }) {
     const [opened, setOpened] = useState(false)
@@ -157,9 +158,13 @@ export default function Menu({ data }) {
                         <>
                             <h1>Konferenzen</h1>
                             <br/>
-                                {dataKonferenz.map((mt, index) => (
+                                {dataKonferenz.map((mt, index) => {
+                                    const conferencePath = `/konferenz/${mt.slug.current}`;
+                                    const isCurrentConference = !isSanityPreviewEnvironment && router.asPath === conferencePath;
+
+                                    return (
                                     <React.Fragment key={index}>
-                                        {router.asPath === `/konferenz/${mt.slug.current}` 
+                                        {isCurrentConference
                                             ? 
 
                                                 <h1 className="menu-konferenz__item" key={index}>
@@ -170,7 +175,7 @@ export default function Menu({ data }) {
                                             : 
 
                                                 <h1 className="menu-konferenz__item" key={index}>
-                                                    <a onClick={() => handleNavigation(`/konferenz/${mt.slug.current}`)}>
+                                                    <a onClick={() => handleNavigation(conferencePath)}>
                                                         {mt.menuTitle}
                                                     </a>
                                                     {index < dataKonferenz.length - 1 && <span>,&nbsp;</span>}
@@ -178,7 +183,8 @@ export default function Menu({ data }) {
 
                                         }
                                     </React.Fragment>
-                                ))}
+                                    );
+                                })}
                         </>
                     }
                     <br/>

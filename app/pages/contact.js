@@ -3,6 +3,7 @@ import React, { useEffect, useRef, useState, useLayoutEffect, use } from "react"
 import { gsap } from "gsap/dist/gsap";
 import Menu from "../components/Menu";
 import client from "../client";
+import { menuItemsQuery } from "../sanityQueries";
 import showAfterLoad from "../components/showAfterLoad";
 import { PortableText } from "@portabletext/react";
 import Footer from "../components/Footer";
@@ -93,13 +94,7 @@ export async function getStaticProps() {
   const [contact] = await client.fetch(`
     *[_type == "contact"]
   `);
-  const menuItems = await client.fetch(`
-    *[defined(menuTitle) && id != "datenschutz" && id != null] | order(order asc) {
-      id,
-      menuTitle,
-      slug
-    }
-  `);
+  const menuItems = await client.fetch(menuItemsQuery);
   return {
     props: {
       contact,

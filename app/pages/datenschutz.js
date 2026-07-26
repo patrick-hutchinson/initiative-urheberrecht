@@ -5,6 +5,7 @@ import showAfterLoad from "../components/showAfterLoad";
 import gsap from "gsap";
 import { useEffect } from "react";
 import client from "../client";
+import { menuItemsQuery } from "../sanityQueries";
 import { PortableText } from "@portabletext/react";
 import Link from "next/link";
 import SanityPreviewFallback, { shouldShowSanityPreviewFallback } from "../components/SanityPreviewFallback";
@@ -124,13 +125,7 @@ export async function getStaticProps() {
       },
     }
   `);
-  const menuItems = await client.fetch(`
-    *[defined(menuTitle) && id != "datenschutz" && id != null] | order(order asc) {
-      id,
-      menuTitle,
-      slug
-    }
-  `);
+  const menuItems = await client.fetch(menuItemsQuery);
   return {
     props: {
       datenschutz,

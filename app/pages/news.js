@@ -4,6 +4,7 @@ import { MainLayout } from "/components/MainLayout";
 import Menu from "/components/Menu";
 import Footer from "/components/Footer";
 import client from "/client";
+import { menuItemsQuery } from "/sanityQueries";
 import showAfterLoad from "../components/showAfterLoad";
 import { gsap } from "gsap";
 import SanityPreviewFallback, { shouldShowSanityPreviewFallback } from "/components/SanityPreviewFallback";
@@ -71,13 +72,7 @@ export default function News({ menuItems }) {
 }
 
 export async function getStaticProps() {
-  const menuItems = await client.fetch(`
-      *[defined(menuTitle) && id != "datenschutz" && id != null] | order(order asc) {
-        id,
-        menuTitle,
-        slug
-      }
-    `);
+  const menuItems = await client.fetch(menuItemsQuery);
 
   return {
     props: {

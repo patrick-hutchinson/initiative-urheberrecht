@@ -2,7 +2,7 @@ import { MainLayout } from "../components/MainLayout";
 import React, { useEffect, useRef, useState, useContext } from "react";
 import { gsap } from "gsap/dist/gsap";
 import Menu from "../components/Menu";
-import client from "../sanityClient";
+import client from "../client";
 import RandomImage from "../components/RandomImage";
 import Slogan from "../components/Slogan";
 import Footer from "../components/Footer";
@@ -17,19 +17,17 @@ import Link from "next/link";
 import OverflowPortableText from "../components/overflowPortableText";
 import Modal from "react-modal";
 import checkBack from "../components/checkBack";
+import SanityPreviewFallback, {
+  SanityPreviewValue,
+  shouldShowSanityPreviewFallback,
+  hasSanityValue,
+} from "../components/SanityPreviewFallback";
 
 Modal.setAppElement("#__next");
 
 export default function Mitglieder({ mitglieder, menuItems }) {
-  const {
-    overlays,
-    storeOverlays,
-    resetOverlays,
-    closeEvent,
-    storeCloseEvent,
-    openEvent,
-    storeOpenEvent,
-  } = useContext(OverlaysContext);
+  const { overlays, storeOverlays, resetOverlays, closeEvent, storeCloseEvent, openEvent, storeOpenEvent } =
+    useContext(OverlaysContext);
 
   const { width, height } = useWindowDimensions();
 
@@ -38,9 +36,7 @@ export default function Mitglieder({ mitglieder, menuItems }) {
   const router = useRouter();
 
   useEffect(() => {
-    document.body.style.background = getComputedStyle(
-      document.querySelector(":root")
-    ).getPropertyValue("--color_white");
+    document.body.style.background = getComputedStyle(document.querySelector(":root")).getPropertyValue("--color_white");
   }, []);
 
   const registerOverlays = () => {
@@ -79,7 +75,7 @@ export default function Mitglieder({ mitglieder, menuItems }) {
           };
         }
         return overlay;
-      })
+      }),
     );
     storeOpenEvent(true);
 
@@ -96,9 +92,7 @@ export default function Mitglieder({ mitglieder, menuItems }) {
 
   const underlineComp = {
     marks: {
-      underline: ({ children }) => (
-        <span className="underline">{children}</span>
-      ),
+      underline: ({ children }) => <span className="underline">{children}</span>,
       link: ({ children, value }) => {
         return (
           <a href={value.href} rel="noreferrer noopener" target="_blank">
@@ -106,9 +100,7 @@ export default function Mitglieder({ mitglieder, menuItems }) {
           </a>
         );
       },
-      strong: ({ children }) => (
-        <span className="underline-black">{children}</span>
-      ),
+      strong: ({ children }) => <span className="underline-black">{children}</span>,
     },
   };
 
@@ -128,19 +120,13 @@ export default function Mitglieder({ mitglieder, menuItems }) {
   const greyAndUnderlineComp = {
     block: ({ children }) => <p className="grey">{children}</p>,
     marks: {
-      underline: ({ children }) => (
-        <span className="underline">{children}</span>
-      ),
+      underline: ({ children }) => <span className="underline">{children}</span>,
     },
   };
 
   const handleNavigation = (path) => {
     gsap.to(
-      [
-        document.querySelector(".page"),
-        document.querySelector("nav"),
-        document.querySelector("#mitglieder-branches"),
-      ],
+      [document.querySelector(".page"), document.querySelector("nav"), document.querySelector("#mitglieder-branches")],
       {
         opacity: 0,
         duration: 1,
@@ -154,10 +140,10 @@ export default function Mitglieder({ mitglieder, menuItems }) {
                 ...overlay,
                 show: false,
               };
-            })
+            }),
           );
         },
-      }
+      },
     );
   };
 
@@ -176,6 +162,16 @@ export default function Mitglieder({ mitglieder, menuItems }) {
 
   checkBack();
 
+  if (shouldShowSanityPreviewFallback(mitglieder, menuItems)) {
+    return (
+      <MainLayout>
+        <SanityPreviewFallback />
+      </MainLayout>
+    );
+  }
+
+  const rechtsbeistandePeople = mitglieder.rechtsbeistande?.people || [];
+
   return (
     <MainLayout>
       <section id="mitglieder-page" className="page" style={{ opacity: 0 }}>
@@ -183,10 +179,7 @@ export default function Mitglieder({ mitglieder, menuItems }) {
           <div className="uniblock">
             <div className="uniblock-title">
               <h1 className="scalable-first over">
-                <a
-                  className="no-underline"
-                  onClick={() => handleNavigation("/")}
-                >
+                <a className="no-underline" onClick={() => handleNavigation("/")}>
                   <span style={{ letterSpacing: "-0.06em" }}>©</span>
                 </a>
                 {width < 576 ? <br /> : ` `}
@@ -194,49 +187,30 @@ export default function Mitglieder({ mitglieder, menuItems }) {
               </h1>
             </div>
             <div className="uniblock-image">
-              {mitglieder.topImages && (
-                <RandomImage
-                  id={mitglieder.menuTitle}
-                  data={mitglieder.topImages}
-                />
-              )}
+              {mitglieder.topImages && <RandomImage id={mitglieder.menuTitle} data={mitglieder.topImages} />}
             </div>
             {width > 992 ? (
               <div className="uniblock-text">
-                <PortableText
-                  value={mitglieder.description}
-                  components={underlineComp}
-                />
+                <PortableText value={mitglieder.description} components={underlineComp} />
               </div>
             ) : (
-              <OverflowPortableText
-                value={mitglieder.description}
-                components={underlineComp}
-              />
+              <OverflowPortableText value={mitglieder.description} components={underlineComp} />
             )}
           </div>
         )}
         <div className="block">
           <div className="block-title">
             <h1 className="scalable">
-              <a onClick={() => openOverlay("mitglieder-overlay", 0)}>
-                {mitglieder.verbande.title}
-              </a>
+              <a onClick={() => openOverlay("mitglieder-overlay", 0)}>{mitglieder.verbande.title}</a>
             </h1>
             <h1 className="scalable">
-              <a onClick={() => openOverlay("mitglieder-overlay", 0)}>
-                {mitglieder.extraordinaryMembers.title}
-              </a>
+              <a onClick={() => openOverlay("mitglieder-overlay", 0)}>{mitglieder.extraordinaryMembers.title}</a>
             </h1>
             <h1 className="scalable">
-              <a onClick={() => openOverlay("mitglieder-overlay", 1)}>
-                {mitglieder.organisations.title}
-              </a>
+              <a onClick={() => openOverlay("mitglieder-overlay", 1)}>{mitglieder.organisations.title}</a>
             </h1>
             <h1 className="scalable">
-              <a onClick={() => openOverlay("mitglieder-overlay", 2)}>
-                {mitglieder.rechtsbeistande.title}
-              </a>
+              <a onClick={() => openOverlay("mitglieder-overlay", 2)}>{mitglieder.rechtsbeistande.title}</a>
             </h1>
           </div>
           <div className="block-image link-on-top-x">
@@ -255,10 +229,7 @@ export default function Mitglieder({ mitglieder, menuItems }) {
             )}
           </div>
           <div className="block-text">
-            <PortableText
-              value={mitglieder.middleDescription}
-              components={underlineComp}
-            />
+            <PortableText value={mitglieder.middleDescription} components={underlineComp} />
           </div>
         </div>
         <Slogan
@@ -312,10 +283,50 @@ export default function Mitglieder({ mitglieder, menuItems }) {
                           <div className="person-title">
                             <h3>
                               {v.title}
-                              <PortableText
-                                value={v.description}
-                                components={linksBlank}
+                              <PortableText value={v.description} components={linksBlank} />
+                            </h3>
+                          </div>
+                          <div className="mitglieder-logo">
+                            {v.imageUrl && (
+                              <Image
+                                src={`${v.imageUrl}?dpr=1`}
+                                srcSet={`${v.imageUrl}?dpr=2 2x`}
+                                width="0"
+                                height="0"
+                                sizes="auto"
+                                priority
+                                // {...useNextImageFade('')}
                               />
+                            )}
+                          </div>
+                        </div>
+                        {width >= 768 && index % 4 === 3 && (
+                          <>
+                            <div></div>
+                            <div className={index + 1 !== mitglieder.verbande.verband.length ? "divider" : ""}></div>
+                          </>
+                        )}
+                      </React.Fragment>
+                    ))}
+                </div>
+              </div>
+            </>
+          )}
+          {mitglieder.extraordinaryMembers && (
+            <>
+              <div className="overlay-content-title">
+                <h1 data-index={1}>{mitglieder.extraordinaryMembers.title}</h1>
+              </div>
+              <div className="overlay-content-body">
+                <div className="persons">
+                  {mitglieder.extraordinaryMembers.extraordinaryMember[0] &&
+                    mitglieder.extraordinaryMembers.extraordinaryMember.map((v, index) => (
+                      <React.Fragment key={index}>
+                        <div className="person">
+                          <div className="person-title">
+                            <h3>
+                              {v.title}
+                              <PortableText value={v.description} components={linksBlank} />
                             </h3>
                           </div>
                           <div className="mitglieder-logo">
@@ -337,71 +348,13 @@ export default function Mitglieder({ mitglieder, menuItems }) {
                             <div></div>
                             <div
                               className={
-                                index + 1 !== mitglieder.verbande.verband.length
-                                  ? "divider"
-                                  : ""
+                                index + 1 !== mitglieder.extraordinaryMembers.extraordinaryMember.length ? "divider" : ""
                               }
                             ></div>
                           </>
                         )}
                       </React.Fragment>
                     ))}
-                </div>
-              </div>
-            </>
-          )}
-          {mitglieder.extraordinaryMembers && (
-            <>
-              <div className="overlay-content-title">
-                <h1 data-index={1}>{mitglieder.extraordinaryMembers.title}</h1>
-              </div>
-              <div className="overlay-content-body">
-                <div className="persons">
-                  {mitglieder.extraordinaryMembers.extraordinaryMember[0] &&
-                    mitglieder.extraordinaryMembers.extraordinaryMember.map(
-                      (v, index) => (
-                        <React.Fragment key={index}>
-                          <div className="person">
-                            <div className="person-title">
-                              <h3>
-                                {v.title}
-                                <PortableText
-                                  value={v.description}
-                                  components={linksBlank}
-                                />
-                              </h3>
-                            </div>
-                            <div className="mitglieder-logo">
-                              {v.imageUrl && (
-                                <Image
-                                  src={`${v.imageUrl}?dpr=1`}
-                                  srcSet={`${v.imageUrl}?dpr=2 2x`}
-                                  width="0"
-                                  height="0"
-                                  sizes="auto"
-                                  priority
-                                  // {...useNextImageFade('')}
-                                />
-                              )}
-                            </div>
-                          </div>
-                          {width >= 768 && index % 4 === 3 && (
-                            <>
-                              <div></div>
-                              <div
-                                className={
-                                  index + 1 !==
-                                  mitglieder.extraordinaryMembers
-                                    .extraordinaryMember.length
-                                    ? "divider"
-                                    : ""
-                                }
-                              ></div>
-                            </>
-                          )}
-                        </React.Fragment>
-                      )
-                    )}
                 </div>
               </div>
             </>
@@ -418,17 +371,11 @@ export default function Mitglieder({ mitglieder, menuItems }) {
                                 </div> */}
                   {width >= 768 ? (
                     <div className="mitglieder-organisationen">
-                      <PortableText
-                        value={mitglieder.organisations.description}
-                        components={linksBlank}
-                      />
+                      <PortableText value={mitglieder.organisations.description} components={linksBlank} />
                     </div>
                   ) : (
                     <h5>
-                      <PortableText
-                        value={mitglieder.organisations.description}
-                        components={linksBlank}
-                      />
+                      <PortableText value={mitglieder.organisations.description} components={linksBlank} />
                     </h5>
                   )}
                 </div>
@@ -462,12 +409,7 @@ export default function Mitglieder({ mitglieder, menuItems }) {
                           <>
                             <div></div>
                             <div
-                              className={
-                                index + 1 !==
-                                mitglieder.organisations.organisation.length
-                                  ? "divider"
-                                  : ""
-                              }
+                              className={index + 1 !== mitglieder.organisations.organisation.length ? "divider" : ""}
                             ></div>
                           </>
                         )}
@@ -484,50 +426,48 @@ export default function Mitglieder({ mitglieder, menuItems }) {
               </div>
               <div className="overlay-content-body">
                 <div className="col-2-grid">
-                  {mitglieder.rechtsbeistande.people[0] &&
-                    mitglieder.rechtsbeistande.people.map((p, index) => (
+                  {rechtsbeistandePeople.length > 0 &&
+                    rechtsbeistandePeople.map((p, index) => (
                       <React.Fragment key={index}>
-                        <div className="person">
-                          <div className="person-title">
-                            <h3>
-                              {p.name} <br /> {p.regalia}
-                            </h3>
+                        {p ? (
+                          <div className="person">
+                            <div className="person-title">
+                              <h3>
+                                <SanityPreviewValue value={p.name} /> <br /> <SanityPreviewValue value={p.regalia} />
+                              </h3>
+                            </div>
+                            <div className="person-photo">
+                              {p.imageUrl && (
+                                <Image
+                                  src={`${p.imageUrl}?dpr=1`}
+                                  srcSet={`${p.imageUrl}?dpr=2 2x`}
+                                  placeholder="blur"
+                                  blurDataURL={p.blurDataURL.metadata.lqip}
+                                  width="0"
+                                  height="0"
+                                  sizes="auto"
+                                  priority
+                                  // {...useNextImageFade('')}
+                                />
+                              )}
+                            </div>
+                            <div className="person-about">
+                              <h3>
+                                {hasSanityValue(p.about) ? (
+                                  <PortableText value={p.about} components={linksBlank} />
+                                ) : (
+                                  <SanityPreviewFallback />
+                                )}
+                              </h3>
+                            </div>
                           </div>
-                          <div className="person-photo">
-                            {p.imageUrl && (
-                              <Image
-                                src={`${p.imageUrl}?dpr=1`}
-                                srcSet={`${p.imageUrl}?dpr=2 2x`}
-                                placeholder="blur"
-                                blurDataURL={p.blurDataURL.metadata.lqip}
-                                width="0"
-                                height="0"
-                                sizes="auto"
-                                priority
-                                // {...useNextImageFade('')}
-                              />
-                            )}
-                          </div>
-                          <div className="person-about">
-                            <h3>
-                              <PortableText
-                                value={p.about}
-                                components={linksBlank}
-                              />
-                            </h3>
-                          </div>
-                        </div>
+                        ) : (
+                          <SanityPreviewFallback className="person" />
+                        )}
                         {width >= 768 && index % 4 === 3 && (
                           <>
                             <div></div>
-                            <div
-                              className={
-                                index + 1 !==
-                                mitglieder.rechtsbeistande.people.length
-                                  ? "divider"
-                                  : ""
-                              }
-                            ></div>
+                            <div className={index + 1 !== rechtsbeistandePeople.length ? "divider" : ""}></div>
                           </>
                         )}
                       </React.Fragment>

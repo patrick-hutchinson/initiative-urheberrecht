@@ -2,7 +2,7 @@ import { MainLayout } from "../components/MainLayout";
 import React, { useEffect, useRef, useState, useContext } from "react";
 import { gsap } from "gsap/dist/gsap";
 import Menu from "../components/Menu";
-import client from "../sanityClient";
+import client from "../client";
 import showAfterLoad from "../components/showAfterLoad";
 import { format } from "date-fns";
 import { isPast, parseISO } from "date-fns";
@@ -19,26 +19,27 @@ import Modal from "react-modal";
 import Overlay from "/components/Overlay";
 import checkBack from "/components/checkBack";
 import Fotoarchiv from "../components/Fotoarchiv";
+import SanityPreviewFallback, { shouldShowSanityPreviewFallback } from "../components/SanityPreviewFallback";
 
 export default function Presse({ presse, menuItems, anchors, fotoarchiv }) {
-  const {
-    overlays,
-    storeOverlays,
-    resetOverlays,
-    closeEvent,
-    storeCloseEvent,
-    openEvent,
-    storeOpenEvent,
-  } = useContext(OverlaysContext);
+  const { overlays, storeOverlays, resetOverlays, closeEvent, storeCloseEvent, openEvent, storeOpenEvent } =
+    useContext(OverlaysContext);
   const { width, height } = useWindowDimensions();
   const router = useRouter();
 
   showAfterLoad({ showIn: "false" });
 
-  useEffect(() => {
-  }, []);
+  useEffect(() => {}, []);
 
   gsap.registerPlugin(ScrollToPlugin);
+
+  if (shouldShowSanityPreviewFallback(presse, menuItems, anchors, fotoarchiv)) {
+    return (
+      <MainLayout>
+        <SanityPreviewFallback />
+      </MainLayout>
+    );
+  }
 
   function scrollTo(y) {
     gsap.to(window, {
@@ -62,16 +63,14 @@ export default function Presse({ presse, menuItems, anchors, fotoarchiv }) {
               ...overlay,
               show: false,
             };
-          })
+          }),
         );
       },
     });
   };
 
   useEffect(() => {
-    document.body.style.background = getComputedStyle(
-      document.querySelector(":root")
-    ).getPropertyValue("--color_white");
+    document.body.style.background = getComputedStyle(document.querySelector(":root")).getPropertyValue("--color_white");
 
     gsap.registerPlugin(ScrollTrigger);
     const ps = [...document.querySelectorAll(".presse-posts-post p")];
@@ -87,7 +86,7 @@ export default function Presse({ presse, menuItems, anchors, fotoarchiv }) {
           duration: 0.7,
           autoAlpha: 1,
           scale: 1,
-        }
+        },
       );
 
       ScrollTrigger.create({
@@ -122,7 +121,7 @@ export default function Presse({ presse, menuItems, anchors, fotoarchiv }) {
           };
         }
         return overlay;
-      })
+      }),
     );
     storeOpenEvent(true);
 
@@ -177,15 +176,12 @@ export default function Presse({ presse, menuItems, anchors, fotoarchiv }) {
                     <a
                       key={index}
                       onClick={() => {
-                        scrollTo(
-                          document.querySelector(`[data-index*="${anchor}"]`)
-                            .offsetTop + 1
-                        );
+                        scrollTo(document.querySelector(`[data-index*="${anchor}"]`).offsetTop + 1);
                       }}
                     >
                       <h3>{anchor}</h3>
                     </a>
-                  ))
+                  )),
                 )}
               </div>
             )}
@@ -193,11 +189,7 @@ export default function Presse({ presse, menuItems, anchors, fotoarchiv }) {
         </div>
         <div className="presse-posts">
           {presse.posts.map((p, index) =>
-            !p.inverse ? (
-              <Post data={p} key={index} />
-            ) : (
-              <InversePost data={p} key={index} openModal={openOverlay} />
-            )
+            !p.inverse ? <Post data={p} key={index} /> : <InversePost data={p} key={index} openModal={openOverlay} />,
           )}
         </div>
       </section>
@@ -208,19 +200,14 @@ export default function Presse({ presse, menuItems, anchors, fotoarchiv }) {
           overlays.find((overlay) => overlay.ref === "fotoarchiv") &&
           overlays.find((overlay) => overlay.ref === "fotoarchiv").show
         }
-        onRequestClose={() =>
-          router.push("/presse", undefined, { shallow: true, scroll: false })
-        }
+        onRequestClose={() => router.push("/presse", undefined, { shallow: true, scroll: false })}
         style={modalStyle}
       >
         <Overlay id="fotoarchiv">
           <div className="overlay-content-title">
             <h1>
               <span style={{ letterSpacing: "-0.06em" }}>
-                <a
-                  onClick={() => handleNavigation("/")}
-                  className="no-underline white"
-                >
+                <a onClick={() => handleNavigation("/")} className="no-underline white">
                   ©
                 </a>
                 {width < 576 && <br />}

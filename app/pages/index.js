@@ -1,13 +1,14 @@
-import React, { useEffect, useRef, useState, useLayoutEffect } from 'react';
-import { MainLayout } from "../components/MainLayout"
-import Poster from '../components/Poster'
-import { useRouter } from 'next/router';
+import React, { useEffect, useRef, useState, useLayoutEffect } from "react";
+import { MainLayout } from "../components/MainLayout";
+import Poster from "../components/Poster";
+import { useRouter } from "next/router";
 import { gsap } from "gsap/dist/gsap";
-import client from '../sanityClient';
-import { drawConsoleLabel } from '../utils/consoleLabel';
+import client from "../client";
+import { drawConsoleLabel } from "../utils/consoleLabel";
+import SanityPreviewFallback, { shouldShowSanityPreviewFallback } from "../components/SanityPreviewFallback";
 
 export default function App({ konferenzes, poster }) {
-  const router = useRouter()
+  const router = useRouter();
   const hasRendered = useRef(false);
 
   useEffect(() => {
@@ -16,26 +17,33 @@ export default function App({ konferenzes, poster }) {
       hasRendered.current = true;
     }
   }, []);
-  
+
+  if (shouldShowSanityPreviewFallback(konferenzes, poster)) {
+    return (
+      <MainLayout>
+        <SanityPreviewFallback />
+      </MainLayout>
+    );
+  }
+
   const goToKonf = () => {
-    gsap.to(document.querySelector('.gallery'), {
+    gsap.to(document.querySelector(".gallery"), {
       opacity: 0,
       duration: 1,
-      onComplete: () =>  {
-        router.push(`/konferenz/${konferenzes[konferenzes.length - 1].slug.current}`)
-      } 
-    })
-  }
+      onComplete: () => {
+        router.push(`/konferenz/${konferenzes[konferenzes.length - 1].slug.current}`);
+      },
+    });
+  };
 
   return (
     <MainLayout>
       <section id="poster-frame" onClick={goToKonf} style={{ opacity: 1 }}>
-        <Poster data={poster}/>
+        <Poster data={poster} />
       </section>
     </MainLayout>
-  )
+  );
 }
-
 
 export async function getStaticProps() {
   const konferenzes = await client.fetch(`
@@ -54,8 +62,8 @@ export async function getStaticProps() {
   return {
     props: {
       konferenzes,
-      poster
+      poster,
     },
     revalidate: 60, // Revalidate every minute
-  }
+  };
 }

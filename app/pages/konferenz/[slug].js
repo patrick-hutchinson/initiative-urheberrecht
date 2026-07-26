@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useContext } from "react";
 import { MainLayout } from "/components/MainLayout";
 import Menu from "/components/Menu";
-import client from "/sanityClient";
+import client from "/client";
 import RandomImage from "/components/RandomImage";
 import Image from "next/image";
 import Slogan from "/components/Slogan";
@@ -20,11 +20,12 @@ import Modal from "react-modal";
 import checkBack from "/components/checkBack";
 import Fotoarchiv from "/components/Fotoarchiv";
 import { FotoarchivContext } from "/contexts/FotoarchivContext";
+import SanityPreviewFallback, { SanityPreviewValue, shouldShowSanityPreviewFallback, hasSanityValue } from "/components/SanityPreviewFallback";
 
 Modal.setAppElement("#__next");
 
 // export async function getServerSideProps() {
-//   const fotos = await sanityClient.fetch(`*[_type == "photo"] | order(orderRank asc)`);
+//   const fotos = await client.fetch(`*[_type == "photo"] | order(orderRank asc)`);
 //   return { props: { fotos } };
 // }
 
@@ -157,6 +158,16 @@ export default function Konferenz({ konferenz, menuItems, fotoarchiv }) {
   };
 
   checkBack();
+
+  if (shouldShowSanityPreviewFallback(konferenz, menuItems, fotoarchiv)) {
+    return (
+      <MainLayout>
+        <SanityPreviewFallback />
+      </MainLayout>
+    );
+  }
+
+  const amPodium = konferenz.amPodium || [];
 
   return (
     <MainLayout>
@@ -356,35 +367,43 @@ export default function Konferenz({ konferenz, menuItems, fotoarchiv }) {
           </div>
           <div className="overlay-content-body">
             <div className="col-2-grid">
-              {konferenz.amPodium &&
-                konferenz.amPodium.map((a, index) => (
+              {amPodium.length > 0 &&
+                amPodium.map((a, index) => (
                   <React.Fragment key={index}>
-                    <div className="person">
-                      <div className="person-title">
-                        <h3>
-                          {a.name} <br /> {a.regalia}
-                        </h3>
+                    {a ? (
+                      <div className="person">
+                        <div className="person-title">
+                          <h3>
+                            <SanityPreviewValue value={a.name} /> <br /> <SanityPreviewValue value={a.regalia} />
+                          </h3>
+                        </div>
+                        <div className="person-photo">
+                          {a.imageUrl && (
+                            <Image
+                              src={`${a.imageUrl}?dpr=1`}
+                              srcSet={`${a.imageUrl}?dpr=2 2x`}
+                              placeholder="blur"
+                              blurDataURL={a.blurDataURL.metadata.lqip}
+                              width="0"
+                              height="0"
+                              sizes="auto"
+                              priority
+                            />
+                          )}
+                        </div>
+                        <div className="person-about">
+                          <h3>
+                            {hasSanityValue(a.about) ? (
+                              <PortableText value={a.about} components={linksBlank} />
+                            ) : (
+                              <SanityPreviewFallback />
+                            )}
+                          </h3>
+                        </div>
                       </div>
-                      <div className="person-photo">
-                        {a.imageUrl && (
-                          <Image
-                            src={`${a.imageUrl}?dpr=1`}
-                            srcSet={`${a.imageUrl}?dpr=2 2x`}
-                            placeholder="blur"
-                            blurDataURL={a.blurDataURL.metadata.lqip}
-                            width="0"
-                            height="0"
-                            sizes="auto"
-                            priority
-                          />
-                        )}
-                      </div>
-                      <div className="person-about">
-                        <h3>
-                          <PortableText value={a.about} components={linksBlank} />
-                        </h3>
-                      </div>
-                    </div>
+                    ) : (
+                      <SanityPreviewFallback className="person" />
+                    )}
                     {width >= 768 && index % 4 === 3 && (
                       <>
                         <div></div>

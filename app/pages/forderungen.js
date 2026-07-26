@@ -2,7 +2,7 @@ import { MainLayout } from "../components/MainLayout";
 import React, { useEffect, useRef, useState, useContext } from "react";
 import { gsap } from "gsap/dist/gsap";
 import Menu from "../components/Menu";
-import client from "../sanityClient";
+import client from "../client";
 import RandomImage from "../components/RandomImage";
 import Slogan from "../components/Slogan";
 import Footer from "../components/Footer";
@@ -17,19 +17,13 @@ import OverflowPortableText from "../components/overflowPortableText";
 import Link from "next/link";
 import Modal from "react-modal";
 import checkBack from "../components/checkBack";
+import SanityPreviewFallback, { shouldShowSanityPreviewFallback } from "../components/SanityPreviewFallback";
 
 Modal.setAppElement("#__next");
 
 export default function Forderungen({ forderungen, menuItems }) {
-  const {
-    overlays,
-    storeOverlays,
-    resetOverlays,
-    closeEvent,
-    storeCloseEvent,
-    openEvent,
-    storeOpenEvent,
-  } = useContext(OverlaysContext);
+  const { overlays, storeOverlays, resetOverlays, closeEvent, storeCloseEvent, openEvent, storeOpenEvent } =
+    useContext(OverlaysContext);
   const forAnchorRef = useRef();
 
   const { width, height } = useWindowDimensions();
@@ -38,10 +32,16 @@ export default function Forderungen({ forderungen, menuItems }) {
 
   const router = useRouter();
 
+  if (shouldShowSanityPreviewFallback(forderungen, menuItems)) {
+    return (
+      <MainLayout>
+        <SanityPreviewFallback />
+      </MainLayout>
+    );
+  }
+
   useEffect(() => {
-    document.body.style.background = getComputedStyle(
-      document.querySelector(":root")
-    ).getPropertyValue("--color_white");
+    document.body.style.background = getComputedStyle(document.querySelector(":root")).getPropertyValue("--color_white");
   }, []);
 
   const registerOverlays = () => {
@@ -80,7 +80,7 @@ export default function Forderungen({ forderungen, menuItems }) {
           };
         }
         return overlay;
-      })
+      }),
     );
     storeOpenEvent(true);
 
@@ -118,9 +118,7 @@ export default function Forderungen({ forderungen, menuItems }) {
 
   const underlineComp = {
     marks: {
-      underline: ({ children }) => (
-        <span className="underline">{children}</span>
-      ),
+      underline: ({ children }) => <span className="underline">{children}</span>,
       link: ({ children, value }) => {
         return (
           <a href={value.href} rel="noreferrer noopener" target="_blank">
@@ -128,18 +126,14 @@ export default function Forderungen({ forderungen, menuItems }) {
           </a>
         );
       },
-      strong: ({ children }) => (
-        <span className="underline-black">{children}</span>
-      ),
+      strong: ({ children }) => <span className="underline-black">{children}</span>,
     },
   };
 
   const greyAndUnderlineComp = {
     block: ({ children }) => <p className="grey">{children}</p>,
     marks: {
-      underline: ({ children }) => (
-        <span className="underline">{children}</span>
-      ),
+      underline: ({ children }) => <span className="underline">{children}</span>,
       link: ({ children, value }) => {
         return (
           <a href={value.href} rel="noreferrer noopener" target="_blank">
@@ -152,11 +146,7 @@ export default function Forderungen({ forderungen, menuItems }) {
 
   const handleNavigation = (path) => {
     gsap.to(
-      [
-        document.querySelector(".page"),
-        document.querySelector("nav"),
-        document.querySelector("#forderungen-branches"),
-      ],
+      [document.querySelector(".page"), document.querySelector("nav"), document.querySelector("#forderungen-branches")],
       {
         opacity: 0,
         duration: 1,
@@ -170,10 +160,10 @@ export default function Forderungen({ forderungen, menuItems }) {
                 ...overlay,
                 show: false,
               };
-            })
+            }),
           );
         },
-      }
+      },
     );
   };
 
@@ -199,10 +189,7 @@ export default function Forderungen({ forderungen, menuItems }) {
           <div className="uniblock">
             <div className="uniblock-title">
               <h1 className="scalable-first over">
-                <a
-                  className="no-underline"
-                  onClick={() => handleNavigation("/")}
-                >
+                <a className="no-underline" onClick={() => handleNavigation("/")}>
                   <span style={{ letterSpacing: "-0.06em" }}>©</span>
                 </a>
                 {width < 576 ? <br /> : ` `}
@@ -210,25 +197,14 @@ export default function Forderungen({ forderungen, menuItems }) {
               </h1>
             </div>
             <div className="uniblock-image">
-              {forderungen.topImages[0].url && (
-                <RandomImage
-                  id={forderungen.menuTitle}
-                  data={forderungen.topImages}
-                />
-              )}
+              {forderungen.topImages[0].url && <RandomImage id={forderungen.menuTitle} data={forderungen.topImages} />}
             </div>
             {width > 992 ? (
               <div className="uniblock-text">
-                <PortableText
-                  value={forderungen.description}
-                  components={underlineComp}
-                />
+                <PortableText value={forderungen.description} components={underlineComp} />
               </div>
             ) : (
-              <OverflowPortableText
-                value={forderungen.description}
-                components={underlineComp}
-              />
+              <OverflowPortableText value={forderungen.description} components={underlineComp} />
             )}
           </div>
         )}
@@ -239,36 +215,17 @@ export default function Forderungen({ forderungen, menuItems }) {
                 (c, index) =>
                   index !== forderungen.forderungen.categories.length - 1 && (
                     <h1 className="scalable" key={index} ref={forAnchorRef}>
-                      <a
-                        onClick={() =>
-                          openOverlay("forderungen-branches", index)
-                        }
-                      >
-                        {width > 576 ? (
-                          <>{c.title}</>
-                        ) : c.mobileTitle ? (
-                          <>{c.mobileTitle}</>
-                        ) : (
-                          <>{c.title}</>
-                        )}
+                      <a onClick={() => openOverlay("forderungen-branches", index)}>
+                        {width > 576 ? <>{c.title}</> : c.mobileTitle ? <>{c.mobileTitle}</> : <>{c.title}</>}
                         {/* ({c.branches.branch ? c.branches.branch.length : '0'}) */}
                       </a>
                     </h1>
-                  )
+                  ),
               )}
               {forderungen.fzuCategory && (
                 <h1 className="scalable">
-                  <a
-                    onClick={() =>
-                      openOverlay(
-                        "forderungen-branches",
-                        forderungen.forderungen.categories.length - 1
-                      )
-                    }
-                  >
-                    {width > 576
-                      ? forderungen.fzuCategory.title
-                      : forderungen.fzuCategory.titleMobile}
+                  <a onClick={() => openOverlay("forderungen-branches", forderungen.forderungen.categories.length - 1)}>
+                    {width > 576 ? forderungen.fzuCategory.title : forderungen.fzuCategory.titleMobile}
                     {/* ({forderungen.fzuCategory.branches.branch ? forderungen.fzuCategory.branches.branch.length : '0'}) */}
                   </a>
                 </h1>
@@ -280,9 +237,7 @@ export default function Forderungen({ forderungen, menuItems }) {
                   src={`${forderungen.middleImage.url}?dpr=1`}
                   srcSet={`${forderungen.middleImage.url}?dpr=2 2x`}
                   placeholder="blur"
-                  blurDataURL={
-                    forderungen.middleImage.blurDataURL.metadata.lqip
-                  }
+                  blurDataURL={forderungen.middleImage.blurDataURL.metadata.lqip}
                   width={forderungen.middleImage.width}
                   height={forderungen.middleImage.height}
                   sizes="auto"
@@ -292,10 +247,7 @@ export default function Forderungen({ forderungen, menuItems }) {
               )}
             </div>
             <div className="block-text">
-              <PortableText
-                value={forderungen.middleDescription}
-                components={underlineComp}
-              />
+              <PortableText value={forderungen.middleDescription} components={underlineComp} />
             </div>
           </div>
         )}
@@ -334,8 +286,7 @@ export default function Forderungen({ forderungen, menuItems }) {
       <Modal
         isOpen={
           overlays.find((overlay) => overlay.ref === "forderungen-branches") &&
-          overlays.find((overlay) => overlay.ref === "forderungen-branches")
-            .show
+          overlays.find((overlay) => overlay.ref === "forderungen-branches").show
         }
         onRequestClose={() =>
           router.push("/forderungen", undefined, {
@@ -345,11 +296,7 @@ export default function Forderungen({ forderungen, menuItems }) {
         }
         style={modalStyle}
       >
-        <Overlay
-          id="forderungen-branches"
-          anchors={forderungen.forderungen.categories}
-          noAnchor={true}
-        >
+        <Overlay id="forderungen-branches" anchors={forderungen.forderungen.categories} noAnchor={true}>
           {forderungen.forderungen.categories &&
             forderungen.forderungen.categories.map((c, index) => (
               <React.Fragment key={index}>
@@ -359,10 +306,7 @@ export default function Forderungen({ forderungen, menuItems }) {
                       width < 576 ? (
                         <>
                           <span>
-                            <a
-                              onClick={() => handleNavigation("/")}
-                              className="no-underline white"
-                            >
+                            <a onClick={() => handleNavigation("/")} className="no-underline white">
                               ©
                             </a>{" "}
                           </span>
@@ -372,10 +316,7 @@ export default function Forderungen({ forderungen, menuItems }) {
                       ) : (
                         <>
                           <span style={{ letterSpacing: "-0.06em" }}>
-                            <a
-                              onClick={() => handleNavigation("/")}
-                              className="no-underline white"
-                            >
+                            <a onClick={() => handleNavigation("/")} className="no-underline white">
                               ©
                             </a>
                           </span>{" "}
@@ -407,10 +348,7 @@ export default function Forderungen({ forderungen, menuItems }) {
                                     <div className="activity-info"></div>
                                     <div className="activity-title">
                                       <h4>
-                                        <PortableText
-                                          value={b.description}
-                                          components={underlineComp}
-                                        />
+                                        <PortableText value={b.description} components={underlineComp} />
                                       </h4>
                                     </div>
                                   </>
@@ -418,10 +356,7 @@ export default function Forderungen({ forderungen, menuItems }) {
                                   <div className="activity-title">
                                     <h5>
                                       <p>{b.title}</p>
-                                      <PortableText
-                                        value={b.description}
-                                        components={greyAndUnderlineComp}
-                                      />
+                                      <PortableText value={b.description} components={greyAndUnderlineComp} />
                                     </h5>
                                   </div>
                                 )}
@@ -436,10 +371,7 @@ export default function Forderungen({ forderungen, menuItems }) {
                                   <div className="activity-title">
                                     <h4>{a.articleTitle}</h4>
                                     <h4 className="activity-title-description">
-                                      <PortableText
-                                        value={a.articleText}
-                                        components={underlineComp}
-                                      />
+                                      <PortableText value={a.articleText} components={underlineComp} />
                                     </h4>
                                   </div>
                                 </div>
@@ -512,24 +444,13 @@ export async function getStaticProps() {
 
   let allForderungen = 0;
   if (forderungen.forderungen && forderungen.forderungen.categories) {
-    allForderungen = forderungen.forderungen.categories.reduce(
-      (total, category) => {
-        return (
-          total +
-          (category.branches && category.branches.branch
-            ? category.branches.branch.length
-            : 0)
-        );
-      },
-      0
-    );
+    allForderungen = forderungen.forderungen.categories.reduce((total, category) => {
+      return total + (category.branches && category.branches.branch ? category.branches.branch.length : 0);
+    }, 0);
   }
 
   forderungen.allForderungen = allForderungen;
-  forderungen.forderungen.categories = [
-    ...forderungen.forderungen.categories,
-    forderungen.fzuCategory,
-  ];
+  forderungen.forderungen.categories = [...forderungen.forderungen.categories, forderungen.fzuCategory];
 
   return {
     props: {

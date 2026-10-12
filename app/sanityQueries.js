@@ -5,7 +5,8 @@ export const menuItemsQuery = isProduction
     *[defined(menuTitle) && id != "datenschutz" && id != null] | order(order asc) {
       id,
       menuTitle,
-      slug
+      slug,
+      "firstProgramDate": program.days[0].date
     }
   `
   : `
@@ -15,6 +16,8 @@ export const menuItemsQuery = isProduction
     ] | order(order asc) {
       id,
       "menuTitle": coalesce(menuTitle, pageTitle, slug.current),
-      slug
+      pageTitle,
+      slug,
+      "firstProgramDate": program.days[0].date
     }
   `;

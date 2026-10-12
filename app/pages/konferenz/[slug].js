@@ -511,7 +511,7 @@ export async function getStaticPaths() {
 
   return {
     paths,
-    fallback: false,
+    fallback: "blocking",
   };
 }
 
@@ -572,6 +572,10 @@ export async function getStaticProps({ params }) {
     `,
     { slug: params.slug },
   );
+
+  if (!konferenz) {
+    return { notFound: true, revalidate: 60 };
+  }
 
   const fotoarchiv = await client.fetch(`
         {

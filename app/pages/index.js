@@ -4,6 +4,7 @@ import Poster from "../components/Poster";
 import { useRouter } from "next/router";
 import { gsap } from "gsap/dist/gsap";
 import client from "../client";
+import { newestConferenceFirst } from "../utils/conferenceOrder";
 import { drawConsoleLabel } from "../utils/consoleLabel";
 import SanityPreviewFallback, { shouldShowSanityPreviewFallback } from "../components/SanityPreviewFallback";
 
@@ -27,11 +28,13 @@ export default function App({ konferenzes, poster }) {
   }
 
   const goToKonf = () => {
+    const latestConference = konferenzes[0];
+    if (!latestConference?.slug?.current) return;
     gsap.to(document.querySelector(".gallery"), {
       opacity: 0,
       duration: 1,
       onComplete: () => {
-        router.push(`/konferenz/${konferenzes[konferenzes.length - 1].slug.current}`);
+        router.push(`/konferenz/${latestConference.slug.current}`);
       },
     });
   };
@@ -47,8 +50,11 @@ export default function App({ konferenzes, poster }) {
 
 export async function getStaticProps() {
   const konferenzes = await client.fetch(`
-     *[_type == "konferenz"] {
-      slug
+     *[_type == "konferenz" && defined(slug.current)] {
+      slug,
+      menuTitle,
+      pageTitle,
+      "firstProgramDate": program.days[0].date
     }
   `);
 
@@ -61,7 +67,7 @@ export async function getStaticProps() {
 
   return {
     props: {
-      konferenzes,
+      konferenzes: konferenzes.sort(newestConferenceFirst),
       poster,
     },
     revalidate: 60, // Revalidate every minute

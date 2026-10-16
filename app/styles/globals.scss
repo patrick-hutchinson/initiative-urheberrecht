@@ -2109,10 +2109,18 @@ a.transparentAfter::after {
 }
 
 // NEWS
+#news .presse-title {
+  border-bottom: 0;
+}
+
+#news .eapps-facebook-feed-posts-inner {
+  border-top: 0 !important;
+}
+
 .eapps-facebook-feed-inner {
   background: var(--color_white) !important;
   border: 0 !important;
-  width: 75% !important;
+  width: 100% !important;
 }
 
 .eapps-facebook-feed-posts-item {

@@ -17,9 +17,8 @@ export default function News({ menuItems }) {
   useEffect(() => {
     // Load the Elfsight script dynamically
     const script = document.createElement("script");
-    script.src = "https://static.elfsight.com/platform/platform.js";
-    script.setAttribute("data-use-service-core", "true");
-    script.defer = true;
+    script.src = "https://elfsightcdn.com/platform.js";
+    script.async = true;
     document.body.appendChild(script);
 
     // Cleanup function to remove the script when component unmounts
@@ -63,7 +62,7 @@ export default function News({ menuItems }) {
             &nbsp;News
           </h1>
         </div>
-        <div className="elfsight-app-2a4d1154-e4b8-41ac-913a-0190dd03da46" data-elfsight-app-lazy></div>
+        <div className="elfsight-app-5b0156f5-f89c-43c4-81b0-b19cea73faa6" data-elfsight-app-lazy></div>
       </section>
 
       <Menu data={menuItems} />

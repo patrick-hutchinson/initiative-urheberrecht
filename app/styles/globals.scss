@@ -2117,6 +2117,17 @@ a.transparentAfter::after {
   border-top: 0 !important;
 }
 
+#news .eapps-facebook-feed-posts-item {
+  // Keep Elfsight's 20px masonry gutter and its smaller-screen layout.
+  @include l {
+    width: calc(100% / 3 - 20px) !important;
+  }
+
+  @include xxl {
+    width: calc(100% / 5 - 20px) !important;
+  }
+}
+
 .eapps-facebook-feed-inner {
   background: var(--color_white) !important;
   border: 0 !important;
